@@ -42,6 +42,24 @@ app.get("/", (request: Request, response: Response) => {
   response.status(200).send("Hello World");
 });
 
+app.get("/health", async (req: Request, res: Response) => {
+  try {
+    const result = await pool.query("SELECT 1");
+    if (result.rowCount === 1) {
+      res.status(200).send("OK");
+    } else {
+      res.status(500).send("Database health check failed");
+    }
+  } catch (err) {
+    if (err instanceof Error) {
+      console.error("Health check error", err);
+    } else {
+      console.error("Health check error", err);
+    }
+    res.status(500).send("Internal Server Error");
+  }
+});
+
 app.get("/orders", async (req: Request, res: Response) => {
   try {
     const result = await pool.query("SELECT * FROM orders");
