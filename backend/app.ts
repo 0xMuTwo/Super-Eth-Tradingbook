@@ -1,8 +1,6 @@
 import express, { Request, Response } from "express";
 import { body, validationResult } from "express-validator";
-import dotenv from "dotenv";
 import { Pool } from "pg";
-dotenv.config();
 
 const pool = new Pool({
   host: String(process.env.DB_HOST),
