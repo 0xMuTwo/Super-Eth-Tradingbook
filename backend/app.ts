@@ -33,7 +33,7 @@ async function checkDatabaseConnection() {
 }
 checkDatabaseConnection();
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.BACKEND_PORT || 5001;
 // Middleware to parse JSON bodies
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
