@@ -35,3 +35,32 @@ order[]
 
 /match
 POST
+
+TODO List
+
+### Backend Part 1
+
+[x] Create Express App.
+[x] Dockerize Express App.
+[x] Convert to Typescript.
+[x] Initialize Database
+[x] Connect Database to Express App
+[x] Automate DB Creation via Docker
+[x] Create /health endpoint
+[x] Create /orders endpoint
+[x] Create /book endpoint
+
+### Frontend Part 1
+
+[x] Create NextJS App.
+[] Split UI into User Info, Orderbook and Trading Interface
+[] On Refresh, New User with random ETH and Dollar Balance
+[] Display Order Book, calls '/book'
+[] Create Trading Interface
+[] Order Places hit '/orders' endpoint
+[] Web Socket
+[] Implement Matching
+
+### Random Tasks
+
+[] Little Health Checker, Shows if server is healthy on Frontend
