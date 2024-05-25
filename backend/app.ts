@@ -77,10 +77,6 @@ app.get("/orders", async (req: Request, res: Response) => {
 app
   .listen(PORT, () => {
     console.log("Server running at PORT:", PORT);
-    console.log("Debugging!");
-    console.log(
-      `Some envs: ${process.env.DB_HOST}, ${process.env.DB_PASSWORD}`
-    );
   })
   .on("error", (error: Error) => {
     // Gracefully handle error
