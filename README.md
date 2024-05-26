@@ -55,7 +55,8 @@ TODO List
 [x] Create NextJS App.
 [x] Split UI into User Info, Orderbook and Trading Interface
 [x] On Refresh, New User with random ETH and Dollar Balance
-[] Display Order Book, calls '/book'
+[x] Display Order Book, calls '/book'
+[] Style Order Book
 [] Create Trading Interface
 [] Order Places hit '/orders' endpoint
 [] Implement Matching

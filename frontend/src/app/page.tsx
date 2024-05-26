@@ -1,3 +1,4 @@
+import Orderbook from "@/components/Orderbook";
 import UserInfo from "@/components/UserInfo";
 
 export default function Home() {
@@ -7,7 +8,7 @@ export default function Home() {
         <UserInfo />
       </div>
       <div className="bg-red-300 row-start-2 row-span-8 col-span-3">
-        Orderbook
+        <Orderbook />
       </div>
       <div className="bg-blue-400 row-start-2 row-span-8 col-span-2">
         Trading Interface
