@@ -1,6 +1,6 @@
 # Operating Instructions
 
-Run
+Step 1. Run Backend
 
 ```bash
 docker compose up --build
@@ -11,6 +11,12 @@ Shutdown gracefully.
 ```bash
 docker compose down --volumes
 ```
+
+Step 2. Run frontend
+
+`cd frontend`
+`npm run dev`
+switch env to backend link
 
 tree -a -L 2 -I 'node_modules|.git'024-05-25
 
@@ -56,11 +62,12 @@ TODO List
 [x] Split UI into User Info, Orderbook and Trading Interface
 [x] On Refresh, New User with random ETH and Dollar Balance
 [x] Display Order Book, calls '/book'
-[] Style Order Book
+[x] Style Order Book
 [] Create Trading Interface
 [] Order Places hit '/orders' endpoint
 [] Implement Matching
 [] Web Socket
+[] Add envs for links to db
 
 ### Random Tasks
 
