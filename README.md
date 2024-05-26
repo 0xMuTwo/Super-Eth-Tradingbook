@@ -58,8 +58,8 @@ TODO List
 [] Display Order Book, calls '/book'
 [] Create Trading Interface
 [] Order Places hit '/orders' endpoint
-[] Web Socket
 [] Implement Matching
+[] Web Socket
 
 ### Random Tasks
 
