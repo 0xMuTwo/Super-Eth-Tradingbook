@@ -53,8 +53,8 @@ TODO List
 ### Frontend Part 1
 
 [x] Create NextJS App.
-[] Split UI into User Info, Orderbook and Trading Interface
-[] On Refresh, New User with random ETH and Dollar Balance
+[x] Split UI into User Info, Orderbook and Trading Interface
+[x] On Refresh, New User with random ETH and Dollar Balance
 [] Display Order Book, calls '/book'
 [] Create Trading Interface
 [] Order Places hit '/orders' endpoint
