@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import { body, validationResult } from "express-validator";
 import { Pool } from "pg";
+import cors from "cors";
 
 const pool = new Pool({
   host: String(process.env.DB_HOST),
@@ -28,7 +29,9 @@ async function checkDatabaseConnection() {
   }
 }
 checkDatabaseConnection();
+
 const app = express();
+app.use(cors());
 const PORT = process.env.BACKEND_PORT || 5001;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -60,6 +63,7 @@ app.get("/book", async (req: Request, res: Response) => {
     const result = await pool.query(
       "SELECT * FROM orders WHERE status = 'open' ORDER BY price DESC, timestamp ASC"
     );
+    console.log("/book called. Returning data...");
 
     res.status(200).json(result.rows);
   } catch (err) {
