@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { Order } from "@/lib/types";
 import { Button } from "./ui/button";
-import SideOrderBook from "./OrderbookComponents/SideOrderBook";
+import SideOrderBook from "./SideOrderBook";
 
 const getOrderbook = async (): Promise<Order[]> => {
   const res = await fetch("http://localhost:5001/book");
