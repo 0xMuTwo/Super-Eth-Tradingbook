@@ -1,7 +1,8 @@
 "use client";
 import React from "react";
-import SideOrderBook from "./SideOrderBook";
+import OrderbookSide from "./OrderbookSide";
 import useWebSocketStore from "@/stores/useWebSocketStore";
+
 const Orderbook: React.FC = () => {
   const orders = useWebSocketStore((state) => state.orders);
   const buyOrders = orders
@@ -10,6 +11,7 @@ const Orderbook: React.FC = () => {
   const sellOrders = orders
     .filter((order) => order.type === "sell")
     .sort((a, b) => a.price - b.price);
+
   return (
     <div className="flex flex-col h-full max-h-[50vh]">
       <div className="flex gap-10 items-center h-24 py-5">
@@ -24,8 +26,8 @@ const Orderbook: React.FC = () => {
         </h2>
       </div>
       <div className="flex max-h-[70vh]">
-        <SideOrderBook title="Buy Order" orders={buyOrders} orderType="buy" />
-        <SideOrderBook
+        <OrderbookSide title="Buy Order" orders={buyOrders} orderType="buy" />
+        <OrderbookSide
           title="Sell Order"
           orders={sellOrders}
           orderType="sell"

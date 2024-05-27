@@ -23,4 +23,5 @@ const useUserInfoStore = create<UserInfoState>()(
       set((state) => ({ ...state, usdtBalance: usdtBalance })),
   }))
 );
+
 export default useUserInfoStore;

@@ -7,15 +7,18 @@ import {
   names,
 } from "unique-names-generator";
 import useUserInfoStore from "@/stores/useUserInfoStore";
+
 const getRandomInt = (min: number, max: number) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
+
 const randomNameConfig: Config = {
   dictionaries: [adjectives, names],
   separator: "-",
   length: 2,
   style: "capital",
 };
+
 const UserInfo = () => {
   const {
     ethBalance,
@@ -37,6 +40,7 @@ const UserInfo = () => {
       initialized.current = true;
     }
   }, [updateEthBalance, updateUsdtBalance, updateUsername]);
+
   return (
     <div className="flex justify-between px-20 items-center h-full">
       <p className="text-xl">{username}</p>

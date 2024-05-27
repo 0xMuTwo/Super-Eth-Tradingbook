@@ -89,4 +89,9 @@ TODO List
   - [x] Buy order @ $10, Sell order @ 9 & 11, neither go through?
   - [x] Probably have to rework algo, retest FIFO and Partials
 - [x] Refactor Server
-- [] Refactor Frontend
+- [x] Refactor Frontend
+
+## Delivery
+
+- [] Deploy Live Somewhere
+- [] Give thorough instructions for how someone could run this

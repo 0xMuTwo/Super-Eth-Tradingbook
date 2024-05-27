@@ -1,11 +1,13 @@
 import React from "react";
 import { Order } from "@/lib/types";
-interface SideOrderBookProps {
+
+interface OrderbookSideProps {
   title: string;
   orders: Order[];
   orderType: "buy" | "sell";
 }
-const SideOrderBook: React.FC<SideOrderBookProps> = ({
+
+const OrderbookSide: React.FC<OrderbookSideProps> = ({
   title,
   orders,
   orderType,
@@ -20,6 +22,7 @@ const SideOrderBook: React.FC<SideOrderBookProps> = ({
   const orderColorClass =
     orderType === "buy" ? "text-green-400" : "text-red-400";
   let cumulativeTotal = 0;
+
   return (
     <div
       className={`${orderType}-orders w-1/2 border border-slate-300 bg-slate-50 m-4 flex flex-col h-full`}
@@ -56,9 +59,7 @@ const SideOrderBook: React.FC<SideOrderBookProps> = ({
                 <p className="relative z-10">{order.price}</p>
                 <p className="relative z-10">{order.size}</p>
                 <p className="relative z-10">{total.toFixed(2)}</p>
-                <p className="relative z-10">
-                  {cumulativeTotal.toFixed(2)}
-                </p>{" "}
+                <p className="relative z-10">{cumulativeTotal.toFixed(2)}</p>
               </div>
             );
           })
@@ -67,4 +68,4 @@ const SideOrderBook: React.FC<SideOrderBookProps> = ({
     </div>
   );
 };
-export default SideOrderBook;
+export default OrderbookSide;

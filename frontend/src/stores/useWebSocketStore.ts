@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { Order } from "@/lib/types";
 import useUserInfoStore from "./useUserInfoStore";
+
 interface UserState {
   username: string;
   assets: {
@@ -8,17 +9,7 @@ interface UserState {
     USDT: number;
   };
 }
-interface WebSocketState {
-  orders: Order[];
-  isConnected: boolean;
-  setOrders: (newOrders: Order[]) => void;
-  addOrder: (newOrder: Order) => void;
-  clearOrders: () => void;
-  webSocket: WebSocket | null;
-  webSocketConnecting: boolean;
-  connectWebSocket: () => void;
-  fetchOrders: () => Promise<Order[]>;
-}
+
 const updateUserStates = (userStates: UserState[]) => {
   const userInfoStore = useUserInfoStore.getState();
   const currentUsername = userInfoStore.username;
@@ -38,17 +29,25 @@ const updateUserStates = (userStates: UserState[]) => {
     }
   }
 };
+
+interface WebSocketState {
+  orders: Order[];
+  webSocket: WebSocket | null;
+  webSocketConnecting: boolean;
+  isConnected: boolean;
+  connectWebSocket: () => void;
+  fetchOrders: () => Promise<Order[]>;
+  setOrders: (newOrders: Order[]) => void;
+  addOrder: (newOrder: Order) => void;
+  clearOrders: () => void;
+}
+
 const useWebSocketStore = create<WebSocketState>((set, get) => ({
   orders: [],
-  isConnected: false,
-  setOrders: (newOrders: Order[]) => set(() => ({ orders: newOrders })),
-  addOrder: (newOrder: Order) =>
-    set((state) => ({
-      orders: [...state.orders, newOrder],
-    })),
-  clearOrders: () => set(() => ({ orders: [] })),
   webSocket: null,
   webSocketConnecting: false,
+  isConnected: false,
+
   connectWebSocket: () => {
     const { webSocket, webSocketConnecting, setOrders, clearOrders } = get();
     if (webSocket || webSocketConnecting) {
@@ -89,6 +88,7 @@ const useWebSocketStore = create<WebSocketState>((set, get) => ({
     // If already opening, we should handle failed connection gracefully
     set({ webSocketConnecting: true, webSocket: ws });
   },
+
   fetchOrders: async () => {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/book`);
@@ -103,5 +103,13 @@ const useWebSocketStore = create<WebSocketState>((set, get) => ({
       return [];
     }
   },
+
+  setOrders: (newOrders: Order[]) => set(() => ({ orders: newOrders })),
+  addOrder: (newOrder: Order) =>
+    set((state) => ({
+      orders: [...state.orders, newOrder],
+    })),
+  clearOrders: () => set(() => ({ orders: [] })),
 }));
+
 export default useWebSocketStore;
