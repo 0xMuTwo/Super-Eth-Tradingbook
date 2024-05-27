@@ -45,8 +45,8 @@ const Orderbook: React.FC = () => {
   return (
     <div>
       <div className="flex flex-col gap-2">
-        <div className="flex gap-10 items-center h-full">
-          <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
+        <div className="flex gap-10 items-center h-full pt-5">
+          <h1 className="pl-20 scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
             Orderbook
           </h1>
           <h2 className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0">
@@ -56,7 +56,7 @@ const Orderbook: React.FC = () => {
             ETH/USDT
           </h2>
         </div>
-        <div className="pb-5 pl-5 ba">
+        <div className="pb-5 pl-20 ba">
           <Button onClick={() => fetchOrders(false)}>
             {refreshing ? "Loading..." : "Refresh"}
           </Button>
