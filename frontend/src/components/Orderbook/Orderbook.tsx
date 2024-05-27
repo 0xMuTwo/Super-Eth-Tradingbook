@@ -1,6 +1,5 @@
 "use client";
 import React from "react";
-import { Button } from "@/components/ui/button";
 import SideOrderBook from "./SideOrderBook";
 import useWebSocketStore from "@/stores/useWebSocketStore";
 const Orderbook: React.FC = () => {
