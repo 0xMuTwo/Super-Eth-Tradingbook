@@ -16,10 +16,18 @@ import TradingNotification from "./TradingNotification";
 import useUserInfoStore from "@/stores/useUserInfoStore";
 
 const TradingInterface = () => {
-  const { ethBalance, usdtBalance, username } = useUserInfoStore((state) => ({
+  const {
+    ethBalance,
+    usdtBalance,
+    username,
+    updateEthBalance,
+    updateUsdtBalance,
+  } = useUserInfoStore((state) => ({
     ethBalance: state.ethBalance,
     usdtBalance: state.usdtBalance,
     username: state.username,
+    updateEthBalance: state.updateEthBalance,
+    updateUsdtBalance: state.updateUsdtBalance,
   }));
   const [buyAmount, setBuyAmount] = useState<number>(1);
   const [buyPrice, setBuyPrice] = useState<number>(10);
@@ -82,6 +90,12 @@ const TradingInterface = () => {
     );
 
     if (response.ok) {
+      if (side === "buy") {
+        const totalCost = amount * price;
+        updateUsdtBalance(usdtBalance - totalCost);
+      } else if (side === "sell") {
+        updateEthBalance(ethBalance - amount);
+      }
       setFeedbackMessage("Order placed successfully!");
       setMessageType("success");
     } else {
