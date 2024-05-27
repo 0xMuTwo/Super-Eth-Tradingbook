@@ -68,13 +68,13 @@ TODO List
   - [x] Implement Zustand State Management
   - [x] Safeguards for selling more than you have
   - [x] Removing from Balance on Bid
-- [] Implement Matching
+- [x] Implement Matching
   - [x] Matching Algorithm
     - [x] FIFO
     - [x] Partial Fills
   - [x] Payload to update user balances on Match
   - [x] Web Socket updates orderbook
-  - [] Web Socket updates user balances
+  - [x] Web Socket updates user balances
 - [] Add envs for links to db
   -[] Put websocket in ENV
 - [] UI Cleanup!
