@@ -158,12 +158,10 @@ async function matchOrders() {
     asset: string;
     amount: number;
   }> = [];
-  const orderBook = {
-    buyOrders: [] as Order[],
-    sellOrders: [] as Order[],
-  };
+  const orderBook = { buyOrders: [] as Order[], sellOrders: [] as Order[] };
   try {
     await client.query("BEGIN");
+    // Fetch the buy and sell orders from the database
     const buyOrdersResult = await client.query(
       "SELECT * FROM orders WHERE status = 'open' AND type = 'buy' ORDER BY price DESC, timestamp ASC"
     );
@@ -172,16 +170,33 @@ async function matchOrders() {
     );
     let buyOrders = buyOrdersResult.rows as Order[];
     let sellOrders = sellOrdersResult.rows as Order[];
-    orderBook.buyOrders = buyOrders;
-    orderBook.sellOrders = sellOrders;
-    let i = 0;
-    let j = 0;
+    // Log the initial state of the orders
+    console.log("Initial Buy Orders:", JSON.stringify(buyOrders, null, 2));
+    console.log("Initial Sell Orders:", JSON.stringify(sellOrders, null, 2));
+    // Track updates to order sizes and statuses
+    const orderUpdates: Array<{
+      id: number;
+      size: number;
+      status?: "open" | "closed";
+    }> = [];
+    let i = 0,
+      j = 0;
     while (i < buyOrders.length && j < sellOrders.length) {
       const buyOrder = buyOrders[i];
       const sellOrder = sellOrders[j];
-      if (buyOrder.price >= sellOrder.price) {
-        const tradeSize = Math.min(buyOrder.size, sellOrder.size);
-        // Record instructions
+      console.log(
+        `Attempting to match Buy Order: ${JSON.stringify(
+          buyOrder
+        )} with Sell Order: ${JSON.stringify(sellOrder)}`
+      );
+      // Check if the buy order price is greater than or equal to the sell order price
+      if (Number(buyOrder.price) >= Number(sellOrder.price)) {
+        const tradeSize = Math.min(
+          Number(buyOrder.size),
+          Number(sellOrder.size)
+        );
+        const totalPrice = Number(sellOrder.price) * tradeSize;
+        // Record trade instructions for updating balances
         instructions.push({
           username: buyOrder.username,
           asset: "ETH",
@@ -190,7 +205,7 @@ async function matchOrders() {
         instructions.push({
           username: buyOrder.username,
           asset: "USDT",
-          amount: -sellOrder.price * tradeSize,
+          amount: -totalPrice,
         });
         instructions.push({
           username: sellOrder.username,
@@ -200,65 +215,81 @@ async function matchOrders() {
         instructions.push({
           username: sellOrder.username,
           asset: "USDT",
-          amount: sellOrder.price * tradeSize,
+          amount: totalPrice,
         });
-        // Adjust sizes
-        buyOrder.size -= tradeSize;
-        sellOrder.size -= tradeSize;
+        // Log the matched trade
         console.log(
-          `Matched Order: Buy(${
-            buyOrder.username
-          }, ${tradeSize} ETH) with Sell(${sellOrder.username}, ${
-            sellOrder.price * tradeSize
-          } USDT)`
+          `Matched Trade: Buy(${buyOrder.username}, ${tradeSize} ETH @ ${buyOrder.price}) with Sell(${sellOrder.username}, ${totalPrice} USDT)`
         );
-        // Close the matched orders or adjust remaining size
-        if (buyOrder.size === 0) {
-          await client.query(
-            "UPDATE orders SET status = 'closed' WHERE id = $1",
-            [buyOrder.id]
-          );
+        // Adjust order sizes
+        buyOrder.size = buyOrder.size - tradeSize;
+        sellOrder.size = sellOrder.size - tradeSize;
+        // Log the updated sizes
+        console.log(
+          `Updated Buy Order Size: ${buyOrder.size}, Updated Sell Order Size: ${sellOrder.size}`
+        );
+        // Determine which orders are fully matched and update statuses
+        if (Number(buyOrder.size) === 0) {
+          orderUpdates.push({ id: buyOrder.id, size: 0, status: "closed" });
           i++;
         } else {
-          await client.query("UPDATE orders SET size = $1 WHERE id = $2", [
-            buyOrder.size,
-            buyOrder.id,
-          ]);
+          orderUpdates.push({ id: buyOrder.id, size: Number(buyOrder.size) });
         }
-        if (sellOrder.size === 0) {
-          await client.query(
-            "UPDATE orders SET status = 'closed' WHERE id = $1",
-            [sellOrder.id]
-          );
+        if (Number(sellOrder.size) === 0) {
+          orderUpdates.push({ id: sellOrder.id, size: 0, status: "closed" });
           j++;
         } else {
-          await client.query("UPDATE orders SET size = $1 WHERE id = $2", [
-            sellOrder.size,
-            sellOrder.id,
-          ]);
+          orderUpdates.push({ id: sellOrder.id, size: Number(sellOrder.size) });
         }
       } else {
+        // No match possible, move to the next buy order or sell order
         j++;
       }
     }
+    // Update the orders in the database
+    for (const update of orderUpdates) {
+      if (update.status === "closed") {
+        await client.query(
+          "UPDATE orders SET size = 0, status = 'closed' WHERE id = $1",
+          [update.id]
+        );
+      } else {
+        await client.query("UPDATE orders SET size = $1 WHERE id = $2", [
+          update.size,
+          update.id,
+        ]);
+      }
+    }
     await client.query("COMMIT");
-    // After matching, fetch the updated order book
+    // Fetch the state of the order book after matching
     const updatedBuyOrdersResult = await client.query(
       "SELECT * FROM orders WHERE status = 'open' AND type = 'buy' ORDER BY price DESC, timestamp ASC"
     );
     const updatedSellOrdersResult = await client.query(
       "SELECT * FROM orders WHERE status = 'open' AND type = 'sell' ORDER BY price ASC, timestamp ASC"
     );
-    orderBook.buyOrders = updatedBuyOrdersResult.rows as Order[];
-    orderBook.sellOrders = updatedSellOrdersResult.rows as Order[];
+    orderBook.buyOrders = updatedBuyOrdersResult.rows;
+    orderBook.sellOrders = updatedSellOrdersResult.rows;
+    // Log the final state of the orders
+    console.log(
+      "Final Buy Orders:",
+      JSON.stringify(orderBook.buyOrders, null, 2)
+    );
+    console.log(
+      "Final Sell Orders:",
+      JSON.stringify(orderBook.sellOrders, null, 2)
+    );
   } catch (err) {
     await client.query("ROLLBACK");
+    console.error("Error during order matching", err);
     throw err;
   } finally {
     client.release();
   }
+  // Calculate user balances
   const userBalances: { [key: string]: { [asset: string]: number } } = {};
-  instructions.forEach(({ username, asset, amount }) => {
+  for (const instruction of instructions) {
+    const { username, asset, amount } = instruction;
     if (!userBalances[username]) {
       userBalances[username] = {};
     }
@@ -266,7 +297,7 @@ async function matchOrders() {
       userBalances[username][asset] = 0;
     }
     userBalances[username][asset] += amount;
-  });
+  }
   const userStates = Object.entries(userBalances).map(([username, assets]) => ({
     username,
     assets,
