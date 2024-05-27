@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 import { body, validationResult } from "express-validator";
 import { Pool } from "pg";
 import cors from "cors";
+import { Server } from "ws";
 
 const pool = new Pool({
   host: String(process.env.DB_HOST),
@@ -28,15 +29,16 @@ async function checkDatabaseConnection() {
     }
   }
 }
+
 checkDatabaseConnection();
 const app = express();
 app.use(cors());
 const PORT = process.env.BACKEND_PORT || 5001;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
 app.get("/", (request: Request, response: Response) => {
   console.log("Received request on root endpoint");
-
   response.status(200).send("Hello World");
 });
 
@@ -101,6 +103,9 @@ app.post(
         [username, price, size, side]
       );
       console.log(`Orders Endpoint Hit. Inserting Order: ${username}`);
+
+      // Notify all WebSocket clients about the new order
+      broadcastMessage({ type: "newOrder", order: result.rows[0] });
       res.status(201).json(result.rows[0]);
     } catch (err) {
       if (err instanceof Error) {
@@ -116,6 +121,9 @@ app.post(
 app.post("/match", async (req: Request, res: Response) => {
   try {
     const matchResults = await matchOrders();
+
+    // Notify all WebSocket clients about the order match results
+    broadcastMessage({ type: "orderMatch", results: matchResults });
     res.status(200).json(matchResults);
   } catch (err) {
     if (err instanceof Error) {
@@ -134,14 +142,17 @@ async function matchOrders() {
     asset: string;
     amount: number;
   }> = [];
+
   try {
     await client.query("BEGIN");
     const buyOrders = await client.query(
       "SELECT * FROM orders WHERE status = 'open' AND type = 'buy' ORDER BY price DESC, timestamp ASC"
     );
+
     const sellOrders = await client.query(
       "SELECT * FROM orders WHERE status = 'open' AND type = 'sell' ORDER BY price ASC, timestamp ASC"
     );
+
     let i = 0;
     let j = 0;
     while (i < buyOrders.rows.length && j < sellOrders.rows.length) {
@@ -149,17 +160,20 @@ async function matchOrders() {
       const sellOrder = sellOrders.rows[j];
       if (buyOrder.price >= sellOrder.price) {
         const tradeSize = Math.min(buyOrder.size, sellOrder.size);
+
         // Record instructions
         instructions.push({
           username: buyOrder.username,
           asset: "ETH",
           amount: tradeSize,
         });
+
         instructions.push({
           username: buyOrder.username,
           asset: "USDT",
           amount: -sellOrder.price * tradeSize,
         });
+
         instructions.push({
           username: sellOrder.username,
           asset: "ETH",
@@ -175,6 +189,7 @@ async function matchOrders() {
         // Adjust sizes
         buyOrder.size -= tradeSize;
         sellOrder.size -= tradeSize;
+
         console.log(
           `Matched Order: Buy(${
             buyOrder.username
@@ -184,12 +199,12 @@ async function matchOrders() {
         );
 
         // Close the matched orders or adjust remaining size
-
         if (buyOrder.size === 0) {
           await client.query(
             "UPDATE orders SET status = 'closed' WHERE id = $1",
             [buyOrder.id]
           );
+
           i++;
         } else {
           await client.query("UPDATE orders SET size = $1 WHERE id = $2", [
@@ -218,14 +233,12 @@ async function matchOrders() {
     await client.query("COMMIT");
   } catch (err) {
     await client.query("ROLLBACK");
-
     throw err;
   } finally {
     client.release();
   }
 
   const userBalances: { [key: string]: { [asset: string]: number } } = {};
-
   instructions.forEach(({ username, asset, amount }) => {
     if (!userBalances[username]) {
       userBalances[username] = {};
@@ -240,11 +253,10 @@ async function matchOrders() {
     username,
     assets,
   }));
-
   return results;
 }
 
-app
+const server = app
   .listen(PORT, () => {
     console.log("Server running at PORT:", PORT);
   })
@@ -252,3 +264,21 @@ app
     console.error("Server error", error);
     throw new Error(error.message);
   });
+const wss = new Server({ server });
+
+wss.on("connection", (ws) => {
+  console.log("New WebSocket client connected");
+
+  ws.on("close", () => {
+    console.log("WebSocket client disconnected");
+  });
+});
+
+function broadcastMessage(message: any) {
+  wss.clients.forEach((client) => {
+    if (client.readyState === 1) {
+      // WebSocket's OPEN state
+      client.send(JSON.stringify(message));
+    }
+  });
+}

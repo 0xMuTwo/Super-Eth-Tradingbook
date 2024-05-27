@@ -1,39 +1,11 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import { Order } from "@/lib/types";
+import React from "react";
 import { Button } from "@/components/ui/button";
 import SideOrderBook from "./SideOrderBook";
-
-const getOrderbook = async (): Promise<Order[]> => {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/book`);
-  if (!res.ok) {
-    throw new Error("Failed to fetch data");
-  }
-  return res.json();
-};
+import useWebSocketStore from "@/stores/useWebSocketStore";
 
 const Orderbook: React.FC = () => {
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [refreshing, setRefreshing] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-  const fetchOrders = async (isInitialLoad = false) => {
-    isInitialLoad ? setLoading(true) : setRefreshing(true);
-    try {
-      const data = await getOrderbook();
-      setOrders(data);
-      setError(null);
-    } catch (error: any) {
-      setError(error.message);
-    } finally {
-      isInitialLoad ? setLoading(false) : setRefreshing(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchOrders(true);
-  }, []);
-
+  const orders = useWebSocketStore((state) => state.orders);
   const buyOrders = orders
     .filter((order) => order.type === "buy")
     .sort((a, b) => b.price - a.price);
@@ -45,7 +17,7 @@ const Orderbook: React.FC = () => {
   return (
     <div>
       <div className="flex flex-col gap-2">
-        <div className="flex gap-10 items-center h-full pt-5">
+        <div className="flex gap-10 items-center h-full py-5">
           <h1 className="pl-20 scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
             Orderbook
           </h1>
@@ -56,26 +28,15 @@ const Orderbook: React.FC = () => {
             ETH/USDT
           </h2>
         </div>
-        <div className="pb-5 pl-20 ba">
-          <Button onClick={() => fetchOrders(false)}>
-            {refreshing ? "Loading..." : "Refresh"}
-          </Button>
-        </div>
       </div>
-      {loading ? (
-        <p>Loading...</p>
-      ) : error ? (
-        <p>Error: {error}</p>
-      ) : (
-        <div className="order-book flex bg-background">
-          <SideOrderBook title="Buy Order" orders={buyOrders} orderType="buy" />
-          <SideOrderBook
-            title="Sell Order"
-            orders={sellOrders}
-            orderType="sell"
-          />
-        </div>
-      )}
+      <div className="order-book flex bg-background">
+        <SideOrderBook title="Buy Order" orders={buyOrders} orderType="buy" />
+        <SideOrderBook
+          title="Sell Order"
+          orders={sellOrders}
+          orderType="sell"
+        />
+      </div>
     </div>
   );
 };

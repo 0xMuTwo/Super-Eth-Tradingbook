@@ -73,11 +73,12 @@ TODO List
     - [x] FIFO
     - [x] Partial Fills
   - [x] Payload to update user balances on Match
-  - [] Web Socket updates orderbook
+  - [x] Web Socket updates orderbook
   - [] Web Socket updates user balances
 - [] Add envs for links to db
   -[] Put websocket in ENV
 - [] UI Cleanup!
+- [] Refactor Server
 
 ### Random Tasks
 
