@@ -76,9 +76,11 @@ TODO List
   - [] Web Socket updates orderbook
   - [] Web Socket updates user balances
 - [] Add envs for links to db
+  -[] Put websocket in ENV
 - [] UI Cleanup!
 
 ### Random Tasks
 
 - [] Little Health Checker, Shows if server is healthy on Frontend
 - [] Known bug can go negative if spamming button, need balance check on "Bid"
+- [] Change name from "Create Next App"
