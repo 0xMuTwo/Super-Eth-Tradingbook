@@ -12,9 +12,51 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 export function AdminDrawer() {
-  const [goal, setGoal] = React.useState(350);
-  function onClick(adjustment: number) {
-    setGoal(Math.max(200, Math.min(400, goal + adjustment)));
+  async function handleMatchClick() {
+    try {
+      console.log("Match Clicked");
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/match`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const data = await response.json();
+      console.log("Match Successful", data);
+    } catch (error) {
+      console.error("Matching Error", error);
+    }
+  }
+  async function handleDeleteClick() {
+    try {
+      console.log("Delete Clicked");
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/delete-all`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (!response.ok) {
+        const errorText = await response.text(); // Await for the error text for better debugging
+        throw new Error(`Network response was not ok: ${errorText}`);
+      }
+      console.log("Delete Successful");
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error("Deletion Error:", error.message);
+      } else {
+        console.error("Deletion Error:", error);
+      }
+    }
   }
   return (
     <Drawer>
@@ -35,7 +77,7 @@ export function AdminDrawer() {
                 variant="outline"
                 size="icon"
                 className="h-20 w-20 shrink-0 rounded-full"
-                onClick={() => onClick(-10)}
+                onClick={handleMatchClick}
               >
                 <Variable className="h-16 w-16" />
                 <span className="sr-only">Matching</span>
@@ -47,6 +89,7 @@ export function AdminDrawer() {
                 variant="outline"
                 size="icon"
                 className="h-20 w-20 shrink-0 rounded-full"
+                onClick={handleDeleteClick}
               >
                 <Trash2 className="h-16 w-16" />
                 <span className="sr-only">Delete</span>

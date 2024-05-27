@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import { Order } from "@/lib/types";
 import useUserInfoStore from "./useUserInfoStore";
-
 interface UserState {
   username: string;
   assets: {
@@ -13,12 +12,12 @@ interface WebSocketState {
   orders: Order[];
   setOrders: (newOrders: Order[]) => void;
   addOrder: (newOrder: Order) => void;
+  clearOrders: () => void;
   webSocket: WebSocket | null;
   webSocketConnecting: boolean;
   connectWebSocket: () => void;
   fetchOrders: () => Promise<Order[]>;
 }
-
 const updateUserStates = (userStates: UserState[]) => {
   const userInfoStore = useUserInfoStore.getState();
   const currentUsername = userInfoStore.username;
@@ -38,7 +37,6 @@ const updateUserStates = (userStates: UserState[]) => {
     }
   }
 };
-
 const useWebSocketStore = create<WebSocketState>((set, get) => ({
   orders: [],
   setOrders: (newOrders: Order[]) => set(() => ({ orders: newOrders })),
@@ -46,10 +44,11 @@ const useWebSocketStore = create<WebSocketState>((set, get) => ({
     set((state) => ({
       orders: [...state.orders, newOrder],
     })),
+  clearOrders: () => set(() => ({ orders: [] })),
   webSocket: null,
   webSocketConnecting: false,
   connectWebSocket: () => {
-    const { webSocket, webSocketConnecting, setOrders } = get();
+    const { webSocket, webSocketConnecting, setOrders, clearOrders } = get();
     if (webSocket || webSocketConnecting) {
       console.warn(
         "WebSocket is already connected or in the process of connecting"
@@ -73,6 +72,8 @@ const useWebSocketStore = create<WebSocketState>((set, get) => ({
           ...message.results.orderBook.sellOrders,
         ]);
         updateUserStates(message.results.userStates);
+      } else if (message.type === "deleteAll") {
+        clearOrders();
       }
     };
     ws.onclose = () => {

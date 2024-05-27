@@ -79,6 +79,25 @@ app.get("/book", async (req: Request, res: Response) => {
     res.status(500).send("Internal Server Error");
   }
 });
+app.delete("/delete-all", async (req: Request, res: Response) => {
+  try {
+    await pool.query("DELETE FROM orders");
+    console.log("All orders deleted");
+    // Notify all WebSocket clients about the deletion of all orders
+    broadcastMessage({
+      type: "deleteAll",
+      message: "All orders have been deleted",
+    });
+    res.status(200).send("All orders have been deleted");
+  } catch (err) {
+    if (err instanceof Error) {
+      console.error("Error deleting all orders", err);
+    } else {
+      console.error("Error deleting all orders", err);
+    }
+    res.status(500).send("Internal Server Error");
+  }
+});
 app.post(
   "/orders",
   [
