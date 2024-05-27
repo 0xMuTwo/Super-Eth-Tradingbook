@@ -80,8 +80,8 @@ TODO List
 - [x] Allow user to implement /match & /delete-all
 - [x] UI Cleanup!
 - [x] Little Health Checker, Shows if server is healthy on Frontend
-- [] Add envs for links to db
-  -[] Put websocket in ENV
-- [] Refactor Server
+- [x] Add envs for links to db -[x] Put websocket in ENV
+- [x] Change name from "Create Next App"
 
-- [] Change name from "Create Next App"
+- [] Refactor Server
+- [] Refactor Frontend

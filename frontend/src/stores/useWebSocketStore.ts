@@ -58,7 +58,7 @@ const useWebSocketStore = create<WebSocketState>((set, get) => ({
       return;
     }
     set({ webSocketConnecting: true });
-    const ws = new WebSocket(`ws://localhost:5001`); //TODO Put this in env
+    const ws = new WebSocket(`${process.env.NEXT_PUBLIC_WSS_URL}`);
     ws.onopen = () => {
       console.log("WebSocket connected");
       set({ webSocket: ws, webSocketConnecting: false, isConnected: true });
