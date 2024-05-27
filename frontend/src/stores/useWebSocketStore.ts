@@ -47,7 +47,10 @@ const useWebSocketStore = create<WebSocketState>((set, get) => ({
       if (message.type === "newOrder") {
         get().addOrder(message.order);
       } else if (message.type === "orderMatch") {
-        get().updateMatchResults(message.results);
+        get().setOrders([
+          ...message.results.orderBook.buyOrders,
+          ...message.results.orderBook.sellOrders,
+        ]);
       }
     };
 
