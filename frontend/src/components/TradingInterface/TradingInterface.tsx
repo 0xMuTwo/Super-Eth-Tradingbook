@@ -12,12 +12,18 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import TradingNotification from "./TradingNotification";
 
 const TradingInterface = () => {
+  const [username] = useState<string>("Low-Sean"); // fixed username
   const [buyAmount, setBuyAmount] = useState<number>(1);
   const [buyPrice, setBuyPrice] = useState<number>(10);
   const [sellAmount, setSellAmount] = useState<number>(1);
   const [sellPrice, setSellPrice] = useState<number>(10);
+  const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
+  const [messageType, setMessageType] = useState<"success" | "error">(
+    "success"
+  );
   const handleInputChange =
     (setter: React.Dispatch<React.SetStateAction<number>>) =>
     (event: ChangeEvent<HTMLInputElement>) => {
@@ -38,6 +44,43 @@ const TradingInterface = () => {
       }
     };
 
+  const handleSubmit = async (
+    side: "buy" | "sell",
+    amount: number,
+    price: number
+  ) => {
+    const order = {
+      order: {
+        username,
+        side,
+        size: amount,
+        price,
+      },
+    };
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/orders`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(order),
+      }
+    );
+
+    if (response.ok) {
+      setFeedbackMessage("Order placed successfully!");
+      setMessageType("success");
+    } else {
+      setFeedbackMessage("Error placing order. Please try again.");
+      setMessageType("error");
+    }
+    // Clear the feedback message after a few seconds
+    setTimeout(() => {
+      setFeedbackMessage(null);
+    }, 3000);
+  };
+
   return (
     <div className="flex h-full justify-center items-center">
       <Tabs defaultValue="buy" className="w-[400px]">
@@ -56,7 +99,6 @@ const TradingInterface = () => {
                 <Label className="col-span-1" htmlFor="buy-amount">
                   Amount
                 </Label>
-
                 <Input
                   className="col-span-2"
                   id="buy-amount"
@@ -86,9 +128,18 @@ const TradingInterface = () => {
                   USDT
                 </Label>
               </div>
+              {feedbackMessage && (
+                <TradingNotification
+                  className="col-span-4"
+                  message={feedbackMessage}
+                  type={messageType}
+                />
+              )}
             </CardContent>
             <CardFooter>
-              <Button>Bid</Button>
+              <Button onClick={() => handleSubmit("buy", buyAmount, buyPrice)}>
+                Bid
+              </Button>
             </CardFooter>
           </Card>
         </TabsContent>
@@ -131,9 +182,20 @@ const TradingInterface = () => {
                   USDT
                 </Label>
               </div>
+              {feedbackMessage && (
+                <TradingNotification
+                  className="col-span-4"
+                  message={feedbackMessage}
+                  type={messageType}
+                />
+              )}
             </CardContent>
             <CardFooter>
-              <Button>Bid</Button>
+              <Button
+                onClick={() => handleSubmit("sell", sellAmount, sellPrice)}
+              >
+                Sell
+              </Button>
             </CardFooter>
           </Card>
         </TabsContent>

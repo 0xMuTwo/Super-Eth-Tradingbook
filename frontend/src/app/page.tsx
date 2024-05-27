@@ -1,5 +1,5 @@
 import Orderbook from "@/components/Orderbook/Orderbook";
-import TradingInterface from "@/components/TradingInterface";
+import TradingInterface from "@/components/TradingInterface/TradingInterface";
 import UserInfo from "@/components/UserInfo";
 
 export default function Home() {

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import SideOrderBook from "./SideOrderBook";
 
 const getOrderbook = async (): Promise<Order[]> => {
-  const res = await fetch("http://localhost:5001/book");
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/book`);
   if (!res.ok) {
     throw new Error("Failed to fetch data");
   }

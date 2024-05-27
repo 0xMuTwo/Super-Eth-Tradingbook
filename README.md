@@ -64,7 +64,7 @@ TODO List
 - [x] Display Order Book, calls '/book'
 - [x] Style Order Book
 - [x] Create Trading Interface
-- [] Order Places hit '/orders' endpoint
+- [x] Order Places hit '/orders' endpoint
 - [] Implement Matching
 - [] Web Socket
 - [] Add envs for links to db
