@@ -69,11 +69,13 @@ TODO List
   - [x] Safeguards for selling more than you have
   - [x] Removing from Balance on Bid
 - [] Implement Matching
-  - [] Updating user balances on Match
-- [] Web Socket
+  - [x] Payload to update user balances on Match
+  - [] Web Socket to update user balances
+  - [] Web Socket updates orderbook?
 - [] Add envs for links to db
 - [] UI Cleanup!
 
 ### Random Tasks
 
 - [] Little Health Checker, Shows if server is healthy on Frontend
+- [] Known bug can go negative if spamming button, need balance check on "Bid"

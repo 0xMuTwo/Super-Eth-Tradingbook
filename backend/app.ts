@@ -29,7 +29,6 @@ async function checkDatabaseConnection() {
   }
 }
 checkDatabaseConnection();
-
 const app = express();
 app.use(cors());
 const PORT = process.env.BACKEND_PORT || 5001;
@@ -37,6 +36,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.get("/", (request: Request, response: Response) => {
   console.log("Received request on root endpoint");
+
   response.status(200).send("Hello World");
 });
 
@@ -64,7 +64,6 @@ app.get("/book", async (req: Request, res: Response) => {
       "SELECT * FROM orders WHERE status = 'open' ORDER BY price DESC, timestamp ASC"
     );
     console.log("/book called. Returning data...");
-
     res.status(200).json(result.rows);
   } catch (err) {
     if (err instanceof Error) {
@@ -89,6 +88,7 @@ app.post(
     body("order.size").isNumeric().withMessage("Size must be a number"),
     body("order.price").isNumeric().withMessage("Price must be a number"),
   ],
+
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -115,60 +115,133 @@ app.post(
 
 app.post("/match", async (req: Request, res: Response) => {
   try {
-    await matchOrders();
-    res.status(200).send("Order matching completed successfully.");
+    const matchResults = await matchOrders();
+    res.status(200).json(matchResults);
   } catch (err) {
     if (err instanceof Error) {
       console.error("Error matching orders", err);
     } else {
       console.error("Error matching orders", err);
     }
-
     res.status(500).send("Internal Server Error");
   }
 });
 
 async function matchOrders() {
   const client = await pool.connect();
+  const instructions: Array<{
+    username: string;
+    asset: string;
+    amount: number;
+  }> = [];
   try {
     await client.query("BEGIN");
     const buyOrders = await client.query(
-      "SELECT * FROM orders WHERE type = 'buy' AND status = 'open' ORDER BY price DESC, timestamp ASC FOR UPDATE"
+      "SELECT * FROM orders WHERE status = 'open' AND type = 'buy' ORDER BY price DESC, timestamp ASC"
     );
     const sellOrders = await client.query(
-      "SELECT * FROM orders WHERE type = 'sell' AND status = 'open' ORDER BY price ASC, timestamp ASC FOR UPDATE"
+      "SELECT * FROM orders WHERE status = 'open' AND type = 'sell' ORDER BY price ASC, timestamp ASC"
     );
+    let i = 0;
+    let j = 0;
+    while (i < buyOrders.rows.length && j < sellOrders.rows.length) {
+      const buyOrder = buyOrders.rows[i];
+      const sellOrder = sellOrders.rows[j];
+      if (buyOrder.price >= sellOrder.price) {
+        const tradeSize = Math.min(buyOrder.size, sellOrder.size);
+        // Record instructions
+        instructions.push({
+          username: buyOrder.username,
+          asset: "ETH",
+          amount: tradeSize,
+        });
+        instructions.push({
+          username: buyOrder.username,
+          asset: "USDT",
+          amount: -sellOrder.price * tradeSize,
+        });
+        instructions.push({
+          username: sellOrder.username,
+          asset: "ETH",
+          amount: -tradeSize,
+        });
 
-    for (let buyOrder of buyOrders.rows) {
-      for (let sellOrder of sellOrders.rows) {
-        if (
-          buyOrder.price >= sellOrder.price &&
-          buyOrder.status === "open" &&
-          sellOrder.status === "open"
-        ) {
-          const tradeSize = Math.min(buyOrder.size, sellOrder.size);
+        instructions.push({
+          username: sellOrder.username,
+          asset: "USDT",
+          amount: sellOrder.price * tradeSize,
+        });
+
+        // Adjust sizes
+        buyOrder.size -= tradeSize;
+        sellOrder.size -= tradeSize;
+        console.log(
+          `Matched Order: Buy(${
+            buyOrder.username
+          }, ${tradeSize} ETH) with Sell(${sellOrder.username}, ${
+            sellOrder.price * tradeSize
+          } USDT)`
+        );
+
+        // Close the matched orders or adjust remaining size
+
+        if (buyOrder.size === 0) {
           await client.query(
-            "UPDATE orders SET size = size - $1, status = CASE WHEN size - $1 <= 0 THEN 'closed' ELSE 'open' END WHERE id = $2",
-            [tradeSize, buyOrder.id]
+            "UPDATE orders SET status = 'closed' WHERE id = $1",
+            [buyOrder.id]
           );
-
-          await client.query(
-            "UPDATE orders SET size = size - $1, status = CASE WHEN size - $1 <= 0 THEN 'closed' ELSE 'open' END WHERE id = $2",
-            [tradeSize, sellOrder.id]
-          );
-
-          if (buyOrder.size <= tradeSize) break;
+          i++;
+        } else {
+          await client.query("UPDATE orders SET size = $1 WHERE id = $2", [
+            buyOrder.size,
+            buyOrder.id,
+          ]);
         }
+
+        if (sellOrder.size === 0) {
+          await client.query(
+            "UPDATE orders SET status = 'closed' WHERE id = $1",
+            [sellOrder.id]
+          );
+          j++;
+        } else {
+          await client.query("UPDATE orders SET size = $1 WHERE id = $2", [
+            sellOrder.size,
+            sellOrder.id,
+          ]);
+        }
+      } else {
+        j++;
       }
     }
 
     await client.query("COMMIT");
   } catch (err) {
     await client.query("ROLLBACK");
+
     throw err;
   } finally {
     client.release();
   }
+
+  const userBalances: { [key: string]: { [asset: string]: number } } = {};
+
+  instructions.forEach(({ username, asset, amount }) => {
+    if (!userBalances[username]) {
+      userBalances[username] = {};
+    }
+    if (!userBalances[username][asset]) {
+      userBalances[username][asset] = 0;
+    }
+    userBalances[username][asset] += amount;
+  });
+
+  const results = Object.entries(userBalances).map(([username, assets]) => ({
+    username,
+    assets,
+  }));
+
+  return results;
 }
 
 app

@@ -91,8 +91,7 @@ const TradingInterface = () => {
 
     if (response.ok) {
       if (side === "buy") {
-        const totalCost = amount * price;
-        updateUsdtBalance(usdtBalance - totalCost);
+        updateUsdtBalance(usdtBalance - price * amount);
       } else if (side === "sell") {
         updateEthBalance(ethBalance - amount);
       }
@@ -106,6 +105,8 @@ const TradingInterface = () => {
       setFeedbackMessage(null);
     }, 3000);
   };
+  const totalBuyCost = buyAmount * buyPrice;
+  const totalSellCost = sellAmount * sellPrice;
 
   return (
     <div className="flex h-full justify-center items-center">
@@ -151,6 +152,22 @@ const TradingInterface = () => {
                   onBlur={handleBlur(setBuyPrice, 10)}
                 />
                 <Label className="col-span-1" htmlFor="buy-price">
+                  USDT/ETH
+                </Label>
+              </div>
+              <div className="grid grid-cols-4 mr-10 items-center gap-2">
+                <Label className="col-span-1" htmlFor="total-buy-cost">
+                  Total
+                </Label>
+                <Input
+                  className="col-span-2"
+                  id="total-buy-cost"
+                  type="number"
+                  value={totalBuyCost}
+                  readOnly
+                  disabled={true}
+                />
+                <Label className="col-span-1" htmlFor="total-buy-cost">
                   USDT
                 </Label>
               </div>
@@ -205,6 +222,25 @@ const TradingInterface = () => {
                   onBlur={handleBlur(setSellPrice, 10)}
                 />
                 <Label className="col-span-1" htmlFor="sell-price">
+                  USDT/ETH
+                </Label>
+              </div>
+
+              <div className="grid grid-cols-4 mr-10 items-center gap-2">
+                <Label className="col-span-1" htmlFor="total-sell-cost">
+                  Total
+                </Label>
+
+                <Input
+                  className="col-span-2"
+                  id="total-sell-cost"
+                  type="number"
+                  value={totalSellCost}
+                  readOnly
+                  disabled={true}
+                />
+
+                <Label className="col-span-1" htmlFor="total-sell-cost">
                   USDT
                 </Label>
               </div>
