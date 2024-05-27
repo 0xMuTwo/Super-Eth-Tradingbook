@@ -65,7 +65,11 @@ TODO List
 - [x] Style Order Book
 - [x] Create Trading Interface
 - [x] Order Places hit '/orders' endpoint
+  - [x] Implement Zustand State Management
+  - [x] Safeguards for selling more than you have
+  - [] Removing from Balance on Bid
 - [] Implement Matching
+  - [] Updating user balances on Match
 - [] Web Socket
 - [] Add envs for links to db
 - [] UI Cleanup!

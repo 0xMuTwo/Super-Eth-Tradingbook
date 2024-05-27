@@ -13,9 +13,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import TradingNotification from "./TradingNotification";
+import useUserInfoStore from "@/stores/useUserInfoStore";
 
 const TradingInterface = () => {
-  const [username] = useState<string>("Low-Sean"); // fixed username
+  const { ethBalance, usdtBalance, username } = useUserInfoStore((state) => ({
+    ethBalance: state.ethBalance,
+    usdtBalance: state.usdtBalance,
+    username: state.username,
+  }));
   const [buyAmount, setBuyAmount] = useState<number>(1);
   const [buyPrice, setBuyPrice] = useState<number>(10);
   const [sellAmount, setSellAmount] = useState<number>(1);
@@ -25,11 +30,18 @@ const TradingInterface = () => {
     "success"
   );
   const handleInputChange =
-    (setter: React.Dispatch<React.SetStateAction<number>>) =>
+    (setter: React.Dispatch<React.SetStateAction<number>>, balance?: number) =>
     (event: ChangeEvent<HTMLInputElement>) => {
       const value = event.target.value;
-      if (value === "" || parseFloat(value) >= 0) {
-        setter(parseFloat(value)); // Allow empty string or non-negative values
+      const numericValue = parseFloat(value);
+      if (value === "" || numericValue >= 0) {
+        if (balance !== undefined && numericValue > balance) {
+          setFeedbackMessage(`Value exceeds your balance of ${balance}`);
+          setMessageType("error");
+        } else {
+          setter(numericValue);
+          setFeedbackMessage(null);
+        }
       }
     };
   const handleBlur =
@@ -40,7 +52,7 @@ const TradingInterface = () => {
     (event: FocusEvent<HTMLInputElement>) => {
       const value = event.target.value;
       if (value === "") {
-        setter(defaultValue); // Set to default value on blur if input is empty
+        setter(defaultValue);
       }
     };
 
@@ -57,6 +69,7 @@ const TradingInterface = () => {
         price,
       },
     };
+    console.log("Order Leaving: ", order);
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_BACKEND_URL}/orders`,
       {
@@ -75,7 +88,6 @@ const TradingInterface = () => {
       setFeedbackMessage("Error placing order. Please try again.");
       setMessageType("error");
     }
-    // Clear the feedback message after a few seconds
     setTimeout(() => {
       setFeedbackMessage(null);
     }, 3000);
@@ -121,7 +133,7 @@ const TradingInterface = () => {
                   id="buy-price"
                   type="number"
                   value={buyPrice}
-                  onChange={handleInputChange(setBuyPrice)}
+                  onChange={handleInputChange(setBuyPrice, usdtBalance)}
                   onBlur={handleBlur(setBuyPrice, 10)}
                 />
                 <Label className="col-span-1" htmlFor="buy-price">
@@ -159,7 +171,7 @@ const TradingInterface = () => {
                   id="sell-amount"
                   type="number"
                   value={sellAmount}
-                  onChange={handleInputChange(setSellAmount)}
+                  onChange={handleInputChange(setSellAmount, ethBalance)}
                   onBlur={handleBlur(setSellAmount, 1)}
                 />
                 <Label className="col-span-1" htmlFor="sell-amount">
