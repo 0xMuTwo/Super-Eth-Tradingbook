@@ -83,6 +83,8 @@ TODO List
 - [x] Add envs for links to db -[x] Put websocket in ENV
 - [x] Change name from "Create Next App"
 
+## Production
+
 - [x] Fix Bug
   - [x] Buy order @ $10, Sell order @ 9 & 11, neither go through?
   - [x] Probably have to rework algo, retest FIFO and Partials

@@ -67,7 +67,9 @@ export function AdminDrawer() {
     <Drawer>
       <DrawerTrigger asChild>
         <div className="flex justify-center items-center py-3 relative">
-          <Button variant="default">Admin Menu</Button>
+          <Button variant="outline" className="border-primary">
+            Admin Menu
+          </Button>
           <div className="absolute right-10 flex">
             <p className="mr-3">Server Status: </p>
             <div className="mt-1">
