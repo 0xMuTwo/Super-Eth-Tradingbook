@@ -46,29 +46,29 @@ TODO List
 
 ### Backend Part 1
 
-[x] Create Express App.
-[x] Dockerize Express App.
-[x] Convert to Typescript.
-[x] Initialize Database
-[x] Connect Database to Express App
-[x] Automate DB Creation via Docker
-[x] Create /health endpoint
-[x] Create /orders endpoint
-[x] Create /book endpoint
+- [x] Create Express App.
+- [x] Dockerize Express App.
+- [x] Convert to Typescript.
+- [x] Initialize Database
+- [x] Connect Database to Express App
+- [x] Automate DB Creation via Docker
+- [x] Create /health endpoint
+- [x] Create /orders endpoint
+- [x] Create /book endpoint
 
 ### Frontend Part 1
 
-[x] Create NextJS App.
-[x] Split UI into User Info, Orderbook and Trading Interface
-[x] On Refresh, New User with random ETH and Dollar Balance
-[x] Display Order Book, calls '/book'
-[x] Style Order Book
-[] Create Trading Interface
-[] Order Places hit '/orders' endpoint
-[] Implement Matching
-[] Web Socket
-[] Add envs for links to db
+- [x] Create NextJS App.
+- [x] Split UI into User Info, Orderbook and Trading Interface
+- [x] On Refresh, New User with random ETH and Dollar Balance
+- [x] Display Order Book, calls '/book'
+- [x] Style Order Book
+- [] Create Trading Interface
+- [] Order Places hit '/orders' endpoint
+- [] Implement Matching
+- [] Web Socket
+- [] Add envs for links to db
 
 ### Random Tasks
 
-[] Little Health Checker, Shows if server is healthy on Frontend
+- [] Little Health Checker, Shows if server is healthy on Frontend
