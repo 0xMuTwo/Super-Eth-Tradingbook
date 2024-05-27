@@ -75,6 +75,8 @@ TODO List
   - [x] Payload to update user balances on Match
   - [x] Web Socket updates orderbook
   - [x] Web Socket updates user balances
+  ### Polish 1
+- [x] Known bug can go negative if spamming button, need balance check on "Bid"
 - [] Add envs for links to db
   -[] Put websocket in ENV
 - [] UI Cleanup!
@@ -83,5 +85,4 @@ TODO List
 ### Random Tasks
 
 - [] Little Health Checker, Shows if server is healthy on Frontend
-- [] Known bug can go negative if spamming button, need balance check on "Bid"
 - [] Change name from "Create Next App"

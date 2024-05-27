@@ -14,7 +14,6 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import TradingNotification from "./TradingNotification";
 import useUserInfoStore from "@/stores/useUserInfoStore";
-
 const TradingInterface = () => {
   const {
     ethBalance,
@@ -63,12 +62,18 @@ const TradingInterface = () => {
         setter(defaultValue);
       }
     };
-
   const handleSubmit = async (
     side: "buy" | "sell",
     amount: number,
     price: number
   ) => {
+    const totalCost = side === "buy" ? amount * price : amount;
+    const availableBalance = side === "buy" ? usdtBalance : ethBalance;
+    if (totalCost > availableBalance) {
+      setFeedbackMessage(`Not enough balance to complete the ${side} order.`);
+      setMessageType("error");
+      return;
+    }
     const order = {
       order: {
         username,
@@ -88,7 +93,6 @@ const TradingInterface = () => {
         body: JSON.stringify(order),
       }
     );
-
     if (response.ok) {
       if (side === "buy") {
         updateUsdtBalance(usdtBalance - price * amount);
@@ -107,7 +111,6 @@ const TradingInterface = () => {
   };
   const totalBuyCost = buyAmount * buyPrice;
   const totalSellCost = sellAmount * sellPrice;
-
   return (
     <div className="flex h-full justify-center items-center">
       <Tabs defaultValue="buy" className="w-[400px]">
@@ -134,7 +137,6 @@ const TradingInterface = () => {
                   onChange={handleInputChange(setBuyAmount)}
                   onBlur={handleBlur(setBuyAmount, 1)}
                 />
-
                 <Label className="col-span-1" htmlFor="buy-amount">
                   ETH
                 </Label>
@@ -225,12 +227,10 @@ const TradingInterface = () => {
                   USDT/ETH
                 </Label>
               </div>
-
               <div className="grid grid-cols-4 mr-10 items-center gap-2">
                 <Label className="col-span-1" htmlFor="total-sell-cost">
                   Total
                 </Label>
-
                 <Input
                   className="col-span-2"
                   id="total-sell-cost"
@@ -239,7 +239,6 @@ const TradingInterface = () => {
                   readOnly
                   disabled={true}
                 />
-
                 <Label className="col-span-1" htmlFor="total-sell-cost">
                   USDT
                 </Label>
@@ -265,5 +264,4 @@ const TradingInterface = () => {
     </div>
   );
 };
-
 export default TradingInterface;
