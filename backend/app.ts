@@ -100,6 +100,7 @@ app.post(
         "INSERT INTO orders (username, price, size, type, status) VALUES ($1, $2, $3, $4, 'open') RETURNING *",
         [username, price, size, side]
       );
+      console.log(`Orders Endpoint Hit. Inserting Order: ${username}`);
       res.status(201).json(result.rows[0]);
     } catch (err) {
       if (err instanceof Error) {
