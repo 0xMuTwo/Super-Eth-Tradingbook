@@ -77,12 +77,11 @@ TODO List
   - [x] Web Socket updates user balances
   ### Polish 1
 - [x] Known bug can go negative if spamming button, need balance check on "Bid"
+- [] Allow user to implement /match
+- [] Little Health Checker, Shows if server is healthy on Frontend
 - [] Add envs for links to db
   -[] Put websocket in ENV
-- [] UI Cleanup!
+- [x] UI Cleanup!
 - [] Refactor Server
 
-### Random Tasks
-
-- [] Little Health Checker, Shows if server is healthy on Frontend
 - [] Change name from "Create Next App"
