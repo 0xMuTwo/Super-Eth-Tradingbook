@@ -10,6 +10,7 @@ interface UserState {
 }
 interface WebSocketState {
   orders: Order[];
+  isConnected: boolean;
   setOrders: (newOrders: Order[]) => void;
   addOrder: (newOrder: Order) => void;
   clearOrders: () => void;
@@ -39,6 +40,7 @@ const updateUserStates = (userStates: UserState[]) => {
 };
 const useWebSocketStore = create<WebSocketState>((set, get) => ({
   orders: [],
+  isConnected: false,
   setOrders: (newOrders: Order[]) => set(() => ({ orders: newOrders })),
   addOrder: (newOrder: Order) =>
     set((state) => ({
@@ -59,7 +61,7 @@ const useWebSocketStore = create<WebSocketState>((set, get) => ({
     const ws = new WebSocket(`ws://localhost:5001`); //TODO Put this in env
     ws.onopen = () => {
       console.log("WebSocket connected");
-      set({ webSocket: ws, webSocketConnecting: false });
+      set({ webSocket: ws, webSocketConnecting: false, isConnected: true });
     };
     ws.onmessage = (event) => {
       const message = JSON.parse(event.data);
@@ -78,11 +80,11 @@ const useWebSocketStore = create<WebSocketState>((set, get) => ({
     };
     ws.onclose = () => {
       console.log("WebSocket disconnected");
-      set({ webSocket: null });
+      set({ webSocket: null, isConnected: false });
     };
     ws.onerror = (error) => {
       console.error("WebSocket error", error);
-      set({ webSocket: null, webSocketConnecting: false });
+      set({ webSocket: null, webSocketConnecting: false, isConnected: false });
     };
     // If already opening, we should handle failed connection gracefully
     set({ webSocketConnecting: true, webSocket: ws });

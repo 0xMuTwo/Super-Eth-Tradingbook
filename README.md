@@ -79,7 +79,7 @@ TODO List
 - [x] Known bug can go negative if spamming button, need balance check on "Bid"
 - [x] Allow user to implement /match & /delete-all
 - [x] UI Cleanup!
-- [] Little Health Checker, Shows if server is healthy on Frontend
+- [x] Little Health Checker, Shows if server is healthy on Frontend
 - [] Add envs for links to db
   -[] Put websocket in ENV
 - [] Refactor Server

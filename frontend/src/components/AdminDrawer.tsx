@@ -11,7 +11,10 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
+import useWebSocketStore from "@/stores/useWebSocketStore";
+import HealthIndicator from "./HealthIndicator";
 export function AdminDrawer() {
+  const { isConnected } = useWebSocketStore();
   const [selectedAction, setSelectedAction] = React.useState("");
   async function executeAction() {
     if (selectedAction === "match") {
@@ -63,8 +66,14 @@ export function AdminDrawer() {
   return (
     <Drawer>
       <DrawerTrigger asChild>
-        <div className="flex justify-center py-3">
-          <Button variant="outline">Admin Menu</Button>
+        <div className="flex justify-center items-center py-3 relative">
+          <Button variant="default">Admin Menu</Button>
+          <div className="absolute right-10 flex">
+            <p className="mr-3">Server Status: </p>
+            <div className="mt-1">
+              <HealthIndicator isConnected={isConnected} />
+            </div>
+          </div>
         </div>
       </DrawerTrigger>
       <DrawerContent>
