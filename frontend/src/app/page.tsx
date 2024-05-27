@@ -1,4 +1,5 @@
-import Orderbook from "@/components/Orderbook";
+import Orderbook from "@/components/Orderbook/Orderbook";
+import TradingInterface from "@/components/TradingInterface";
 import UserInfo from "@/components/UserInfo";
 
 export default function Home() {
@@ -11,7 +12,7 @@ export default function Home() {
         <Orderbook />
       </div>
       <div className="bg-red-400 row-start-2 row-span-8 col-span-2">
-        Trading Interface
+        <TradingInterface />
       </div>
     </main>
   );

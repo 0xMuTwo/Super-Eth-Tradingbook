@@ -63,7 +63,7 @@ TODO List
 - [x] On Refresh, New User with random ETH and Dollar Balance
 - [x] Display Order Book, calls '/book'
 - [x] Style Order Book
-- [] Create Trading Interface
+- [x] Create Trading Interface
 - [] Order Places hit '/orders' endpoint
 - [] Implement Matching
 - [] Web Socket
