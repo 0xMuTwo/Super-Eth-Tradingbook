@@ -88,5 +88,5 @@ TODO List
 - [x] Fix Bug
   - [x] Buy order @ $10, Sell order @ 9 & 11, neither go through?
   - [x] Probably have to rework algo, retest FIFO and Partials
-- [] Refactor Server
+- [x] Refactor Server
 - [] Refactor Frontend
