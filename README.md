@@ -68,6 +68,7 @@ TODO List
 - [] Implement Matching
 - [] Web Socket
 - [] Add envs for links to db
+- [] UI Cleanup!
 
 ### Random Tasks
 
