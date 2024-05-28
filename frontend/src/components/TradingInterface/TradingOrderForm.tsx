@@ -57,7 +57,7 @@ const TradingOrderForm: FC<TradingOrderFormProps> = ({
   feedbackMessage,
   messageType,
 }) => {
-  const totalCost = side === "buy" ? amount * price : amount;
+  const totalCost = amount * price;
   return (
     <Card>
       <CardHeader>
