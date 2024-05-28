@@ -93,5 +93,5 @@ TODO List
 
 ## Delivery
 
-- [] Deploy Live Somewhere
+- [x] Deploy Live Somewhere [Deployment](https://opyn-takehome.vercel.app/)
 - [] Give thorough instructions for how someone could run this
