@@ -156,7 +156,7 @@ The frontend was chosen as Vercel's [Next.js](https://nextjs.org/) with a state 
 
 These were chosen primarily because initial conversations with the Opyn team revealed they were already using these frameworks, so code review would be easier for them. I don't have much of a preference in terms of React Meta Frameworks, they all have pros and cons, I like Vercel's ease of deployment but am not a fan of Next.JS 14's hyper-aggressive caching or defaulting to server components.
 
-Neither of these cons have been addresses in the frontend as I wanted to keep this project as Vanilla as possible, optimizing for quick code reviews. Nothing experimental or off-path.
+Neither of these cons have been addressed in the frontend as I wanted to keep this project as Vanilla as possible, optimizing for quick code reviews. Nothing experimental or off-path.
 
 ### Backend
 
@@ -180,11 +180,14 @@ A particular quirk of my system is that the bid amount gets removed from the acc
 ## The Algorithm
 
 I'm a fairly competent at Frontend, and am not shy to design system architecture and devops, but the algorithm for the matching became difficult due to the changing requirements. Moving it to partial fills & user balance calculations took a bit longer than I'd care to admit working correctly. I thought a lot about DB reads VS redoing calculations in memory, it was especially tempting to do DB reads as the database had near instant response time, but in terms of scalability, it was absolutely not the right move.
+
 If I had more time and were designing a most scalable system, I would consider using indexes on price and timestamp columns for faster sorting, collecting and doing updates in batch, and adding unit tests for edge cases that may break when altering the algorithm.
 
 ## Deployment
 
-Deploying to a digial ocean droplet was easy enough, but getting it in a form where it was accessible from the React App took effort. This was mainly due to HTTPS & WSS issues. I was able to solve this by using an old domain name I happened to have, and performing a reverse proxy to allow traffic to go through the domain then act as local traffic for my localhost:5001 to serve to normally. I'm especially proud of this solution as it allowed for minimal code changes, having a vastly different production and development server is never fun. And this system allows my application to have no idea where the traffic is coming from, allowing local deployments to be 1:1 with production. The trade offs are definitely the technical complexity that comes with it if we ever had to move services, it would require a new NGINX config and a few hours of an engineer's time.
+Deploying to a digial ocean droplet was easy enough, but getting it in a form where it was accessible from the React App took effort. This was mainly due to HTTPS & WSS issues. 
+I was able to solve this by using an old domain name I happened to have, and performing a reverse proxy to allow traffic to go through the domain then act as local traffic for my localhost:5001 to serve to normally. I'm especially proud of this solution as it allowed for minimal code changes, having a vastly different production and development server is never fun. And this system allows my application to have no idea where the traffic is coming from, allowing local deployments to be 1:1 with production. 
+The trade offs are definitely the technical complexity that comes with it if we ever had to move services, it would require a new NGINX config and a few hours of an engineer's time.
 
 # TODO List
 
