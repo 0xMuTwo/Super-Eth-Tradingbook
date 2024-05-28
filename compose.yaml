@@ -1,24 +1,22 @@
-# https://docs.docker.com/compose/compose-file/
-# https://github.com/docker/awesome-compose
 services:
   backend:
     build:
       context: backend
     environment:
       NODE_ENV: production
+      BACKEND_PORT: 5001
     env_file:
       - .env
     ports:
       - 5001:5001
+    volumes:
+      - /etc/letsencrypt/live/c9d0.com/privkey.pem:/etc/ssl/certs/privkey.pem:ro
+      - /etc/letsencrypt/live/c9d0.com/fullchain.pem:/etc/ssl/certs/fullchain.pem:ro
     depends_on:
       db:
         condition: service_healthy
     healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "curl -f http://localhost:${BACKEND_PORT}/health || exit 1",
-        ]
+      test: ["CMD-SHELL", "curl -f https://localhost:5001/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -41,5 +39,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
 volumes:
   db-data:

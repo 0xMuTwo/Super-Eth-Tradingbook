@@ -24,10 +24,8 @@ COPY package*.json ./
 RUN npm install --omit=dev
 # Copy compiled JavaScript files from build stage
 COPY --from=build /usr/src/app/dist /usr/src/app/dist
-# Run the application as a non-root user
-USER node
 # Expose the port that the application listens on
-EXPOSE 3000
+EXPOSE 5001
 # Run the application
 
 CMD ["npm", "run", "start"]

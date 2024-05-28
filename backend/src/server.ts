@@ -1,5 +1,7 @@
 import express from "express";
 import cors from "cors";
+import fs from "fs";
+import https from "https";
 import { initializeWebSocket } from "./websocket";
 import { checkDatabaseConnection } from "./db";
 import routes from "./routes";
@@ -14,12 +16,13 @@ app.use("/", routes);
 
 checkDatabaseConnection();
 
-const server = app
-  .listen(PORT, () => {
-    console.log(`Server running at PORT: ${PORT}`);
-  })
-  .on("error", (error: Error) => {
-    console.error("Server error", error);
-  });
+const httpsOptions = {
+  key: fs.readFileSync('/etc/ssl/certs/privkey.pem'),
+  cert: fs.readFileSync('/etc/ssl/certs/fullchain.pem')
+};
+
+const server = https.createServer(httpsOptions, app).listen(PORT, () => {
+  console.log(`Server running at PORT: ${PORT}`);
+});
 
 initializeWebSocket(server);
