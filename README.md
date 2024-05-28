@@ -1,3 +1,61 @@
+# TL;DR
+
+## What is this?
+
+Results of a take-home assignment for [Opyn](https://opyn.co/)
+
+Objective: Develop an interactive order book application for trading ETH, with a user-friendly interface for a smooth trading experience.
+
+[Production Deployment](https://opyn-takehome.vercel.app)
+
+## Requirements
+
+### Frontend
+
+- Single Page React Application
+
+  - Orderbook
+
+  - Trading Interface
+
+### Backend
+
+- API Development
+
+  - Develop REST API using Node.JS and Express
+
+  - Endpoints
+
+    - `/orders`: Place Orders. No need for modify/cancel.
+
+    - `/book`: Get current orderbook.
+
+    - `/match`: Perform Order Matching
+
+  - Order Matching Engine:
+
+    - Matches buy and sell orders based on price and time priority (First In, First Out).
+
+    - Updates the Orderbook on successful Matches
+
+    - Notifies the Frontend of Updates
+
+- Database: Use any of your choice
+
+### Bonus Points
+
+- Real-Time Data Processing with Web Sockets
+
+## Evaluation Criteria
+
+- **Quality of Implementation**: Focus on implementing features to the highest standard. Prioritize clean, maintainable, and efficient code over simply meeting all requirements.
+
+- **Design**: User interface design quality.
+
+- **Problem-Solving**: How effectively you tackled the given problems and implemented the solution.
+
+- **Bonus Points**: Any additional features or improvements beyond the basic requirements.
+
 # How To Run.
 
 Instructions on how to run the application locally.
