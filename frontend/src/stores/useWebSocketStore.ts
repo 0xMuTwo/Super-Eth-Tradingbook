@@ -64,7 +64,6 @@ const useWebSocketStore = create<WebSocketState>((set, get) => ({
     };
     ws.onmessage = (event) => {
       const message = JSON.parse(event.data);
-      console.log("WSS DATA: ", message);
       if (message.type === "newOrder") {
         get().addOrder(message.order);
       } else if (message.type === "orderMatch") {
